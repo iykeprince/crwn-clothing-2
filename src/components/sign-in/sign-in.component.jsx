@@ -1,7 +1,10 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import CustomButton from '../custom-button/custom-button.component'
 import FormInput from '../form-input/form-input.component'
-import { signInWithGoogle } from '../../firebase/firebase.util';
+import { auth, signInWithGoogle } from '../../firebase/firebase.util';
+import { setCurrentUser } from "../../redux/user/user.actions";
+
 
 import './sign-in.styles.scss'
 
@@ -15,11 +18,13 @@ class SignIn extends React.Component {
         }
     }
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
         event.preventDefault();
 
         const {email, password} = this.state;
-        
+
+        const userAuth = await auth.signInWithEmailAndPassword(email, password);
+        this.props.setCurrentUser(userAuth);
 
         this.setState({email: '', password: ''})
     }
@@ -50,4 +55,7 @@ class SignIn extends React.Component {
     }
 }
 
-export default SignIn;
+const mapDispatchToProps = dispatch => ({
+    setCurrentUser: user => dispatch(setCurrentUser(user))
+})
+export default connect(null, mapDispatchToProps)(SignIn);
